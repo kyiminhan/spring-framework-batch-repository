@@ -5,5 +5,5 @@
     <artifactId>spring-batch-demo</artifactId>
     <version>0.0.1</version>
   </parent>
-  <artifactId>spring-hibernate-demo-002</artifactId>
+  <artifactId>spring-batch-demo-002</artifactId>
 </project>
