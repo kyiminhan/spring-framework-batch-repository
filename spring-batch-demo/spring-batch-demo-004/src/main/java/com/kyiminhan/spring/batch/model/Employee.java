@@ -7,9 +7,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Gets the last name.
+ * The Class Employee.</BR>
  *
- * @return the last name
+ * @author KYIMINHAN </BR>
+ * @version 1.0 </BR>
+ * @since Mar 19, 2019 </BR>
+ *        spring-batch-demo-004 system </BR>
+ *        com.kyiminhan.spring.batch.model </BR>
+ *        Employee.java </BR>
  */
 @Getter
 
@@ -20,10 +25,10 @@ import lombok.Setter;
  */
 @Setter
 
-/*
- * (non-Javadoc)
+/**
+ * Builds the.
  *
- * @see java.lang.Object#toString()
+ * @return Employee
  */
 @Builder
 public class Employee implements Serializable {

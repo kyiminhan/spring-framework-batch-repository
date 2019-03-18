@@ -10,6 +10,12 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.LineMapper;
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +25,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.kyiminhan.spring.batch.model.Employee;
+import com.kyiminhan.spring.batch.processor.ValidationProcessor;
+
 import lombok.Setter;
 
 /**
@@ -26,27 +35,22 @@ import lombok.Setter;
  *
  * @author KYIMINHAN </BR>
  * @version 1.0 </BR>
- * @since 2019/03/18 </BR>
- *        spring-hibernate-demo-002 system </BR>
+ * @since Mar 19, 2019 </BR>
+ *        spring-batch-demo-004 system </BR>
  *        com.kyiminhan.spring.batch.config </BR>
  *        BatchConfig.java </BR>
  */
 @Configuration
 @EnableBatchProcessing
 @ComponentScan(basePackages = { "com.kyinminhan.spring" })
-
-/**
- * Sets the step builder factory.
- *
- * @param stepBuilderFactory the new step builder factory
- */
-@Setter(onMethod = @__(@Autowired))
 public class BatchConfig {
 
 	/** The job builder factory. */
+	@Setter(onMethod = @__(@Autowired))
 	private JobBuilderFactory jobBuilderFactory;
 
 	/** The step builder factory. */
+	@Setter(onMethod = @__(@Autowired))
 	private StepBuilderFactory stepBuilderFactory;
 
 	/**
@@ -86,18 +90,76 @@ public class BatchConfig {
 		return jobLauncher;
 	}
 
-	@Value(value = "/input/inputData.csv")
-	private Resource inputResource;
+	/** The input resource. */
+	@Value("../input/inputData.csv")
+	public Resource inputResource;
 
-	@Bean(value = "readCSVFilesJob")
+	/**
+	 * Read CSV files job.
+	 *
+	 * @return Job
+	 */
+	@Bean("job")
 	public Job readCSVFilesJob() {
-		return this.jobBuilderFactory.get("readCSVFilesJob").incrementer(new RunIdIncrementer()).start(this.stepOne())
-				.build();
+		return this.jobBuilderFactory.get("demoJob").incrementer(new RunIdIncrementer()).start(this.step1()).build();
 	}
 
-	@Bean(value = "stepOne")
-	public Step stepOne() {
-		return this.stepBuilderFactory.get("stepOne").chunk(1).reader(null).processor(null);
+	/**
+	 * Step one.
+	 *
+	 * @return Step
+	 */
+	@Bean
+	public Step step1() {
+		return this.stepBuilderFactory.get("step1").<Employee, Employee>chunk(1).reader(this.reader())
+				.processor(this.processor()).build();
 	}
 
+	/**
+	 * Processor.
+	 *
+	 * @return ItemProcessor
+	 */
+	@Bean
+	public ItemProcessor<Employee, Employee> processor() {
+		return new ValidationProcessor();
+	}
+
+	/**
+	 * Reader.
+	 *
+	 * @return FlatFileItemReader
+	 */
+	@Bean
+	public FlatFileItemReader<Employee> reader() {
+		final FlatFileItemReader<Employee> fileItemReader = new FlatFileItemReader<>();
+		fileItemReader.setLineMapper(this.lineMapper());
+		fileItemReader.setLinesToSkip(1);
+		fileItemReader.setResource(this.inputResource);
+
+		return fileItemReader;
+	}
+
+	/**
+	 * Line mapper.
+	 *
+	 * @return LineMapper
+	 */
+	@Bean
+	public LineMapper<Employee> lineMapper() {
+		final DefaultLineMapper<Employee> defaultLineMapper = new DefaultLineMapper<>();
+		final DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
+		delimitedLineTokenizer.setNames(new String[] { "id", "firstName", "lastName" });
+		delimitedLineTokenizer.setIncludedFields(new int[] { 0, 1, 2 });
+		final BeanWrapperFieldSetMapper<Employee> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
+		fieldSetMapper.setTargetType(Employee.class);
+		defaultLineMapper.setLineTokenizer(delimitedLineTokenizer);
+		defaultLineMapper.setFieldSetMapper(fieldSetMapper);
+		return defaultLineMapper;
+	}
+
+//	@Bean
+//	public ConsoleItemWriter<Employee> writer() {
+//		return new ConsoleItemWriter<Employee>();
+//	}
 }

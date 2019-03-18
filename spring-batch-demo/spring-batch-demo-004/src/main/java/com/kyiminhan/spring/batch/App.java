@@ -14,13 +14,12 @@ import lombok.extern.log4j.Log4j2;
  *
  * @author KYIMINHAN </BR>
  * @version 1.0 </BR>
- * @since 2019/03/18 </BR>
- * spring-batch-demo-002 system </BR>
- * com.kyiminhan.spring.batch </BR>
- * App.java </BR>
+ * @since Mar 19, 2019 </BR>
+ *        spring-batch-demo-004 system </BR>
+ *        com.kyiminhan.spring.batch </BR>
+ *        App.java </BR>
  */
 
-/** The Constant log. */
 @Log4j2
 public class App {
 
@@ -29,7 +28,7 @@ public class App {
 	 *
 	 * @param args the arguments
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		@SuppressWarnings("resource")
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
@@ -42,7 +41,8 @@ public class App {
 		try {
 
 			final JobParameters params = new JobParametersBuilder()
-					.addString("JobID-spring-batch-demo-002", String.valueOf(System.currentTimeMillis())).toJobParameters();
+					.addString("JobID-spring-batch-demo-004", String.valueOf(System.currentTimeMillis()))
+					.toJobParameters();
 
 			final JobExecution execution = jobLauncher.run(job, params);
 			App.log.info("Exit Status : " + execution.getStatus());

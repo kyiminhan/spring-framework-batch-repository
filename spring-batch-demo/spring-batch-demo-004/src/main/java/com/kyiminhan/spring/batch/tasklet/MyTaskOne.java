@@ -8,17 +8,15 @@ import org.springframework.batch.repeat.RepeatStatus;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * The Class FirstBatch.</BR>
+ * The Class MyTaskOne.</BR>
  *
  * @author KYIMINHAN </BR>
  * @version 1.0 </BR>
- * @since 2019/03/18 </BR>
- *        spring-batch-demo-001 system </BR>
- *        com.kyiminhan.spring.batch.Tasklet </BR>
- *        FirstBatch.java </BR>
+ * @since Mar 19, 2019 </BR>
+ *        spring-batch-demo-004 system </BR>
+ *        com.kyiminhan.spring.batch.tasklet </BR>
+ *        MyTaskOne.java </BR>
  */
-
-/** The Constant log. */
 @Log4j2
 public class MyTaskOne implements Tasklet {
 
@@ -30,7 +28,7 @@ public class MyTaskOne implements Tasklet {
 	 * org.springframework.batch.core.scope.context.ChunkContext)
 	 */
 	@Override
-	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+	public RepeatStatus execute(final StepContribution contribution, final ChunkContext chunkContext) throws Exception {
 		MyTaskOne.log.info("***** My Task One is Executing! START *****");
 
 		MyTaskOne.log.info("***** My Task One is Executing! END *****");

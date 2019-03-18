@@ -7,7 +7,7 @@
 			<PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n" />
 		</Console>
  
-		<RollingFile name="RollingFile" filename="C://spring-batch/spring-batch-demo-002.log"
+		<RollingFile name="RollingFile" filename="C://spring-batch/spring-batch-demo-004.log"
 			filepattern="${logPath}/%d{YYYYMMddHHmmss}-fargo.log">
 			<PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n" />
 			<Policies>
