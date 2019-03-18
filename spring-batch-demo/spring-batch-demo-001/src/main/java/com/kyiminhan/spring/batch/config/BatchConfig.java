@@ -40,7 +40,7 @@ import lombok.Setter;
  * @param stepBuilderFactory the new step builder factory
  */
 @Setter(onMethod = @__(@Autowired))
-public class BatchConfiguration {
+public class BatchConfig {
 
 	/** The job builder factoryl. */
 	private JobBuilderFactory jobBuilderFactoryl;

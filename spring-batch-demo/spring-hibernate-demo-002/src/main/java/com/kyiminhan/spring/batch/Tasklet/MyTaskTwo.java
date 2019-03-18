@@ -8,19 +8,19 @@ import org.springframework.batch.repeat.RepeatStatus;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * The Class FirstBatch.</BR>
+ * The Class MyTaskTwo.</BR>
  *
  * @author KYIMINHAN </BR>
  * @version 1.0 </BR>
  * @since 2019/03/18 </BR>
- *        spring-batch-demo-001 system </BR>
- *        com.kyiminhan.spring.batch.Tasklet </BR>
- *        FirstBatch.java </BR>
+ * spring-hibernate-demo-002 system </BR>
+ * com.kyiminhan.spring.batch.Tasklet </BR>
+ * MyTaskTwo.java </BR>
  */
 
 /** The Constant log. */
 @Log4j2
-public class FirstBatch implements Tasklet {
+public class MyTaskTwo implements Tasklet {
 
 	/*
 	 * (non-Javadoc)
@@ -31,8 +31,9 @@ public class FirstBatch implements Tasklet {
 	 */
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		FirstBatch.log.info("** First Batch Job is Executing! **");
-		FirstBatch.log.info("** Hello World.................! **");
+		MyTaskTwo.log.info("***** My Task Two is Executing! START *****");
+
+		MyTaskTwo.log.info("***** My Task Two is Executing! END *****");
 		return RepeatStatus.FINISHED;
 	}
 }

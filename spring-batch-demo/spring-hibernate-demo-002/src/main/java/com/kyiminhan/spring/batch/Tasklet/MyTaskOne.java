@@ -20,7 +20,7 @@ import lombok.extern.log4j.Log4j2;
 
 /** The Constant log. */
 @Log4j2
-public class FirstBatch implements Tasklet {
+public class MyTaskOne implements Tasklet {
 
 	/*
 	 * (non-Javadoc)
@@ -31,8 +31,9 @@ public class FirstBatch implements Tasklet {
 	 */
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		FirstBatch.log.info("** First Batch Job is Executing! **");
-		FirstBatch.log.info("** Hello World.................! **");
+		MyTaskOne.log.info("***** My Task One is Executing! START *****");
+
+		MyTaskOne.log.info("***** My Task One is Executing! END *****");
 		return RepeatStatus.FINISHED;
 	}
 }
