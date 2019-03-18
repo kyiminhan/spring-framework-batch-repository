@@ -10,6 +10,7 @@
 	<modules>
 		<module>spring-batch-demo-001</module>
 		<module>spring-batch-demo-002</module>
+		<module>spring-batch-demo-003</module>
 	</modules>
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>

@@ -15,7 +15,7 @@ import lombok.extern.log4j.Log4j2;
  * @author KYIMINHAN </BR>
  * @version 1.0 </BR>
  * @since 2019/03/18 </BR>
- * spring-batch-demo-002 system </BR>
+ * spring-batch-demo-003 system </BR>
  * com.kyiminhan.spring.batch </BR>
  * App.java </BR>
  */
@@ -42,7 +42,7 @@ public class App {
 		try {
 
 			final JobParameters params = new JobParametersBuilder()
-					.addString("JobID-spring-batch-demo-002", String.valueOf(System.currentTimeMillis())).toJobParameters();
+					.addString("JobID-spring-batch-demo-003", String.valueOf(System.currentTimeMillis())).toJobParameters();
 
 			final JobExecution execution = jobLauncher.run(job, params);
 			App.log.info("Exit Status : " + execution.getStatus());

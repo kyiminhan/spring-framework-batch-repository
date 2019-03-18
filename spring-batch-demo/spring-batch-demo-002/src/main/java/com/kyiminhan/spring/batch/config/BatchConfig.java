@@ -17,8 +17,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.kyiminhan.spring.batch.Tasklet.MyTaskOne;
-import com.kyiminhan.spring.batch.Tasklet.MyTaskTwo;
+import com.kyiminhan.spring.batch.tasklet.MyTaskOne;
+import com.kyiminhan.spring.batch.tasklet.MyTaskTwo;
 
 import lombok.Setter;
 

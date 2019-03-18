@@ -6,6 +6,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
@@ -16,23 +17,26 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.kyiminhan.spring.batch.tasklet.FirstBatch;
+import com.kyiminhan.spring.batch.listener.JobResultListener;
+import com.kyiminhan.spring.batch.listener.StepResultListener;
+import com.kyiminhan.spring.batch.tasklet.MyTaskOne;
+import com.kyiminhan.spring.batch.tasklet.MyTaskTwo;
 
 import lombok.Setter;
 
 /**
- * The Class BatchConfiguration.</BR>
+ * The Class BatchConfig.</BR>
  *
  * @author KYIMINHAN </BR>
  * @version 1.0 </BR>
  * @since 2019/03/18 </BR>
- *        spring-batch-demo-001 system </BR>
+ *        spring-hibernate-demo-002 system </BR>
  *        com.kyiminhan.spring.batch.config </BR>
- *        BatchConfiguration.java </BR>
+ *        BatchConfig.java </BR>
  */
 @Configuration
 @EnableBatchProcessing
-@ComponentScan(basePackages = { "com.kyiminhan" })
+@ComponentScan(basePackages = { "com.kyinminhan.spring" })
 
 /**
  * Sets the step builder factory.
@@ -42,19 +46,19 @@ import lombok.Setter;
 @Setter(onMethod = @__(@Autowired))
 public class BatchConfig {
 
-	/** The job builder factoryl. */
-	private JobBuilderFactory jobBuilderFactoryl;
+	/** The job builder factory. */
+	private JobBuilderFactory jobBuilderFactory;
 
 	/** The step builder factory. */
 	private StepBuilderFactory stepBuilderFactory;
 
 	/**
-	 * Transaction manager.
+	 * Platform transaction manager.
 	 *
 	 * @return PlatformTransactionManager
 	 */
 	@Bean
-	public PlatformTransactionManager transactionManager() {
+	public PlatformTransactionManager platformTransactionManager() {
 		return new ResourcelessTransactionManager();
 	}
 
@@ -66,7 +70,10 @@ public class BatchConfig {
 	 */
 	@Bean
 	public JobRepository jobRepository() throws Exception {
-		return new MapJobRepositoryFactoryBean(this.transactionManager()).getObject();
+		// JobRepository jobRepository = new JobRepositoryFactoryBean();
+		final JobRepository jobRepository = new MapJobRepositoryFactoryBean(this.platformTransactionManager())
+				.getObject();
+		return jobRepository;
 	}
 
 	/**
@@ -83,22 +90,43 @@ public class BatchConfig {
 	}
 
 	/**
-	 * Step 1.
+	 * Step one.
 	 *
 	 * @return Step
 	 */
 	@Bean
-	public Step step1() {
-		return this.stepBuilderFactory.get("step1").tasklet(new FirstBatch()).build();
+	public Step stepOne() {
+		return this.stepBuilderFactory.get("setp1").tasklet(new MyTaskOne()).listener(new StepResultListener())
+				// .listener(new StepItemReadListener())
+				// .listener(new StepItemProcessListener())
+				// .listener(new StepItemWriteListener())
+				// .listener(new StepSkipListener())
+				.build();
 	}
 
 	/**
-	 * Hellwo world job.
+	 * Step two.
+	 *
+	 * @return Step
+	 */
+	@Bean
+	public Step stepTwo() {
+		return this.stepBuilderFactory.get("setp2").tasklet(new MyTaskTwo()).listener(new StepResultListener())
+				// .listener(new StepItemReadListener())
+				// .listener(new StepItemProcessListener())
+				// .listener(new StepItemWriteListener())
+				// .listener(new StepSkipListener())
+				.build();
+	}
+
+	/**
+	 * Demo job.
 	 *
 	 * @return Job
 	 */
 	@Bean("job")
-	public Job hellwoWorldJob() {
-		return this.jobBuilderFactoryl.get("helloWorldJob").start(this.step1()).build();
+	public Job demoJob() {
+		return this.jobBuilderFactory.get("demoJob").incrementer(new RunIdIncrementer())
+				.listener(new JobResultListener()).start(this.stepOne()).next(this.stepTwo()).build();
 	}
 }
