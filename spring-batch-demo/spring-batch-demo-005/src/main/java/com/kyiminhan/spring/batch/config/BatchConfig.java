@@ -1,0 +1,191 @@
+package com.kyiminhan.spring.batch.config;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.LineMapper;
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import com.kyiminhan.spring.batch.model.Employee;
+import com.kyiminhan.spring.batch.processor.ValidationProcessor;
+import com.kyiminhan.spring.batch.schedule.MySchedulerBean;
+import com.kyiminhan.spring.batch.write.ConsoleWriter;
+
+import lombok.Setter;
+
+/**
+ * The Class BatchConfig.</BR>
+ *
+ * @author KYIMINHAN </BR>
+ * @version 1.0 </BR>
+ * @since Mar 19, 2019 </BR>
+ *        spring-batch-demo-004 system </BR>
+ *        com.kyiminhan.spring.batch.config </BR>
+ *        BatchConfig.java </BR>
+ */
+@Configuration
+@EnableBatchProcessing
+@ComponentScan(basePackages = { "com.kyiminhan.spring" })
+@EnableScheduling
+public class BatchConfig implements SchedulingConfigurer {
+
+	/** The job builder factory. */
+	@Setter(onMethod = @__(@Autowired))
+	private JobBuilderFactory jobBuilderFactory;
+
+	/** The step builder factory. */
+	@Setter(onMethod = @__(@Autowired))
+	private StepBuilderFactory stepBuilderFactory;
+
+	/**
+	 * Platform transaction manager.
+	 *
+	 * @return PlatformTransactionManager
+	 */
+	@Bean
+	public PlatformTransactionManager platformTransactionManager() {
+		return new ResourcelessTransactionManager();
+	}
+
+	/**
+	 * Job repository.
+	 *
+	 * @return JobRepository
+	 * @throws Exception the exception
+	 */
+	@Bean
+	public JobRepository jobRepository() throws Exception {
+		// JobRepository jobRepository = new JobRepositoryFactoryBean();
+		final JobRepository jobRepository = new MapJobRepositoryFactoryBean(this.platformTransactionManager())
+				.getObject();
+		return jobRepository;
+	}
+
+	/**
+	 * Job launcher.
+	 *
+	 * @return JobLauncher
+	 * @throws Exception the exception
+	 */
+	@Bean("jobLauncher")
+	public JobLauncher jobLauncher() throws Exception {
+		final SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
+		jobLauncher.setJobRepository(this.jobRepository());
+		return jobLauncher;
+	}
+
+	/** The input resource. */
+	@Value("/input/inputData.csv")
+	private Resource inputResource;
+
+	/**
+	 * Read CSV files job.
+	 *
+	 * @return Job
+	 */
+	@Bean("job")
+	public Job readCSVFilesJob() {
+		return this.jobBuilderFactory.get("demoJob").incrementer(new RunIdIncrementer()).start(this.step1()).build();
+	}
+
+	/**
+	 * Step one.
+	 *
+	 * @return Step
+	 */
+	@Bean
+	public Step step1() {
+		return this.stepBuilderFactory.get("step1").<Employee, Employee>chunk(1).reader(this.reader())
+				.processor(this.processor()).writer(this.writer()).build();
+	}
+
+	@Bean
+	public ItemWriter<Employee> writer() {
+		return new ConsoleWriter();
+	}
+
+	/**
+	 * Processor.
+	 *
+	 * @return ItemProcessor
+	 */
+	@Bean
+	public ItemProcessor<Employee, Employee> processor() {
+		return new ValidationProcessor();
+	}
+
+	/**
+	 * Reader.
+	 *
+	 * @return FlatFileItemReader
+	 */
+	@Bean
+	public FlatFileItemReader<Employee> reader() {
+		final FlatFileItemReader<Employee> fileItemReader = new FlatFileItemReader<>();
+		fileItemReader.setLineMapper(this.lineMapper());
+		fileItemReader.setLinesToSkip(1);
+		fileItemReader.setResource(this.inputResource);
+
+		return fileItemReader;
+	}
+
+	/**
+	 * Line mapper.
+	 *
+	 * @return LineMapper
+	 */
+	@Bean
+	public LineMapper<Employee> lineMapper() {
+		final DefaultLineMapper<Employee> lineMapper = new DefaultLineMapper<>();
+		final DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
+		lineTokenizer.setNames(new String[] { "id", "firstName", "lastName" });
+		lineTokenizer.setIncludedFields(new int[] { 0, 1, 2 });
+		final BeanWrapperFieldSetMapper<Employee> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
+		fieldSetMapper.setTargetType(Employee.class);
+		lineMapper.setLineTokenizer(lineTokenizer);
+		lineMapper.setFieldSetMapper(fieldSetMapper);
+		return lineMapper;
+	}
+
+	@Bean
+	public MySchedulerBean mySchedulerBean() {
+		return new MySchedulerBean();
+	}
+
+	@Override
+	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+		taskRegistrar.setScheduler(this.taskExecutor());
+	}
+
+	@Bean(destroyMethod = "shutdown")
+	public Executor taskExecutor() {
+		return Executors.newScheduledThreadPool(10);
+	}
+
+}
