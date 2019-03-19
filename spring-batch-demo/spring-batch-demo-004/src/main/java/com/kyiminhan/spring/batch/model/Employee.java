@@ -2,9 +2,9 @@ package com.kyiminhan.spring.batch.model;
 
 import java.io.Serializable;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * The Class Employee.</BR>
@@ -24,13 +24,7 @@ import lombok.Setter;
  * @param lastName the new last name
  */
 @Setter
-
-/**
- * Builds the.
- *
- * @return Employee
- */
-@Builder
+@ToString
 public class Employee implements Serializable {
 
 	/** The Constant serialVersionUID. */

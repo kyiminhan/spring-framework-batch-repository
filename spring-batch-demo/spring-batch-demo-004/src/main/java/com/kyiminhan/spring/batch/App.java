@@ -32,7 +32,7 @@ public class App {
 
 		@SuppressWarnings("resource")
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		context.scan("com.kyiminhan");
+		context.scan("com.kyiminhan.spring.batch");
 		context.refresh();
 
 		final Job job = (Job) context.getBean("job");

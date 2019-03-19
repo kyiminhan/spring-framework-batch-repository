@@ -11,6 +11,7 @@ import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
@@ -27,6 +28,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.kyiminhan.spring.batch.model.Employee;
 import com.kyiminhan.spring.batch.processor.ValidationProcessor;
+import com.kyiminhan.spring.batch.write.ConsoleWriter;
 
 import lombok.Setter;
 
@@ -42,7 +44,7 @@ import lombok.Setter;
  */
 @Configuration
 @EnableBatchProcessing
-@ComponentScan(basePackages = { "com.kyinminhan.spring" })
+@ComponentScan(basePackages = { "com.kyiminhan.spring" })
 public class BatchConfig {
 
 	/** The job builder factory. */
@@ -91,8 +93,8 @@ public class BatchConfig {
 	}
 
 	/** The input resource. */
-	@Value("../input/inputData.csv")
-	public Resource inputResource;
+	@Value("/input/inputData.csv")
+	private Resource inputResource;
 
 	/**
 	 * Read CSV files job.
@@ -112,7 +114,12 @@ public class BatchConfig {
 	@Bean
 	public Step step1() {
 		return this.stepBuilderFactory.get("step1").<Employee, Employee>chunk(1).reader(this.reader())
-				.processor(this.processor()).build();
+				.processor(this.processor()).writer(this.writer()).build();
+	}
+
+	@Bean
+	public ItemWriter<Employee> writer() {
+		return new ConsoleWriter();
 	}
 
 	/**
@@ -147,19 +154,14 @@ public class BatchConfig {
 	 */
 	@Bean
 	public LineMapper<Employee> lineMapper() {
-		final DefaultLineMapper<Employee> defaultLineMapper = new DefaultLineMapper<>();
-		final DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
-		delimitedLineTokenizer.setNames(new String[] { "id", "firstName", "lastName" });
-		delimitedLineTokenizer.setIncludedFields(new int[] { 0, 1, 2 });
+		final DefaultLineMapper<Employee> lineMapper = new DefaultLineMapper<>();
+		final DelimitedLineTokenizer lineTokenizer = new DelimitedLineTokenizer();
+		lineTokenizer.setNames(new String[] { "id", "firstName", "lastName" });
+		lineTokenizer.setIncludedFields(new int[] { 0, 1, 2 });
 		final BeanWrapperFieldSetMapper<Employee> fieldSetMapper = new BeanWrapperFieldSetMapper<>();
 		fieldSetMapper.setTargetType(Employee.class);
-		defaultLineMapper.setLineTokenizer(delimitedLineTokenizer);
-		defaultLineMapper.setFieldSetMapper(fieldSetMapper);
-		return defaultLineMapper;
+		lineMapper.setLineTokenizer(lineTokenizer);
+		lineMapper.setFieldSetMapper(fieldSetMapper);
+		return lineMapper;
 	}
-
-//	@Bean
-//	public ConsoleItemWriter<Employee> writer() {
-//		return new ConsoleItemWriter<Employee>();
-//	}
 }
