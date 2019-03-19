@@ -13,6 +13,8 @@
 		<module>spring-batch-demo-003</module>
 		<module>spring-batch-demo-004</module>
 		<module>spring-batch-demo-005</module>
+		<module>spring-batch-demo-006</module>
+		<module>spring-batch-demo-000</module>
 	</modules>
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
