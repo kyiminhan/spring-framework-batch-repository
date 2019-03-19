@@ -25,14 +25,38 @@ import com.kyiminhan.spring.batch.quartzjob.bean.CustomQuartzJobBean;
 
 import lombok.Setter;
 
+/**
+ * The Class QuartzConfig.</BR>
+ *
+ * @author KYIMINHAN </BR>
+ * @version 1.0 </BR>
+ * @since 2019/03/19 </BR>
+ *        spring-batch-demo-006 system </BR>
+ *        com.kyiminhan.spring.batch.config </BR>
+ *        QuartzConfig.java </BR>
+ */
 @Configuration
+
+/**
+ * Sets the job locator.
+ *
+ * @param jobLocator the new job locator
+ */
 @Setter(onMethod = @__(@Autowired))
 public class QuartzConfig {
 
+	/** The job launcher. */
 	private JobLauncher jobLauncher;
 
+	/** The job locator. */
 	private JobLocator jobLocator;
 
+	/**
+	 * Job registry bean post processor.
+	 *
+	 * @param jobRegistry the job registry
+	 * @return JobRegistryBeanPostProcessor
+	 */
 	@Bean
 	public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
 		final JobRegistryBeanPostProcessor beanPostProcessor = new JobRegistryBeanPostProcessor();
@@ -40,6 +64,11 @@ public class QuartzConfig {
 		return beanPostProcessor;
 	}
 
+	/**
+	 * Job one detail.
+	 *
+	 * @return JobDetail
+	 */
 	@Bean
 	public JobDetail jobOneDetail() {
 		final JobDataMap jobDataMap = new JobDataMap();
@@ -51,6 +80,11 @@ public class QuartzConfig {
 				.storeDurably().build();
 	}
 
+	/**
+	 * Job two detail.
+	 *
+	 * @return JobDetail
+	 */
 	@Bean
 	public JobDetail jobTwoDetail() {
 		final JobDataMap jobDataMap = new JobDataMap();
@@ -62,6 +96,11 @@ public class QuartzConfig {
 				.storeDurably().build();
 	}
 
+	/**
+	 * Job one trigger.
+	 *
+	 * @return Trigger
+	 */
 	@Bean
 	public Trigger jobOneTrigger() {
 
@@ -72,6 +111,11 @@ public class QuartzConfig {
 				.withSchedule(scheduleBuilder).build();
 	}
 
+	/**
+	 * Job two trigger.
+	 *
+	 * @return Trigger
+	 */
 	@Bean
 	public Trigger jobTwoTrigger() {
 
@@ -83,6 +127,12 @@ public class QuartzConfig {
 
 	}
 
+	/**
+	 * Scheduler factory bean.
+	 *
+	 * @return SchedulerFactoryBean
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@Bean
 	public SchedulerFactoryBean schedulerFactoryBean() throws IOException {
 
@@ -94,6 +144,12 @@ public class QuartzConfig {
 
 	}
 
+	/**
+	 * Quartz properties.
+	 *
+	 * @return Properties
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@Bean
 	public Properties quartzProperties() throws IOException {
 
