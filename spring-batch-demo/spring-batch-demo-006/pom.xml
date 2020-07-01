@@ -9,7 +9,7 @@
 	</parent>
 	<artifactId>spring-batch-demo-006</artifactId>
 	<properties>
-		<quartz-framework.version>2.3.0</quartz-framework.version>
+		<quartz-framework.version>2.3.2</quartz-framework.version>
 	</properties>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
