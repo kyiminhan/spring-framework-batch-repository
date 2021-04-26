@@ -30,7 +30,7 @@
 		<!-- Apache Common Version -->
 		<apache.common.lang.version>3.8.1</apache.common.lang.version>
 		<apache.common.collections.version>4.3</apache.common.collections.version>
-		<apache.common.io.version>2.6</apache.common.io.version>
+		<apache.common.io.version>2.7</apache.common.io.version>
 	</properties>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
